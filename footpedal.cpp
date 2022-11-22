@@ -1,4 +1,3 @@
-#include <Joystick.h>
 
 // Pin assignments for polling.
 
@@ -12,10 +11,16 @@ const int triplePins[] = { 2, 3 };
 // Pins in this array are polled individually and reported as single buttons.
 const int singlePins[] = { 4, 5 };
 
-const uint8_t triplesCount = (sizeof(triplePins) / sizeof(triplePins[0]));
-const uint8_t singlesCount = (sizeof(singlePins) / sizeof(singlePins[0]));
+const unsigned char triplesCount = (sizeof(triplePins) / sizeof(triplePins[0]));
+const unsigned char singlesCount = (sizeof(singlePins) / sizeof(singlePins[0]));
 const int buttonCount = (triplesCount * 3) / 2 + singlesCount;
 
+// Uncomment this to emulate joystick buttons.
+// Comment it out to emulate keyboard keys (F16 and up).
+// #define EMULATE_JOYSTICK 1
+
+#ifdef EMULATE_JOYSTICK
+#include <Joystick.h>
 // USB descriptor for a gamepad with nothing but buttons.
 Joystick_ Joystick
 (
@@ -35,6 +40,12 @@ Joystick_ Joystick
 		false, // includeBrake
 		false // includeSteering
 );
+
+#else
+// USB descriptor for a keyboard. We'll assign keys starting at KEY_F16
+#include <Keyboard.h>
+
+#endif
 
 int lastButtonState[buttonCount];
 
@@ -69,8 +80,13 @@ void setup() {
     lastButtonState[i] = 0;
   }
 
+#ifdef EMULATE_JOYSTICK
   // Initialize Joystick Library
   Joystick.begin();
+#else
+  Keyboard.begin();
+#endif
+
 }
 
 void loop() {
@@ -104,7 +120,15 @@ void loop() {
     {
         if (lastButtonState[button] != current[j])
         {
+#ifdef EMULATE_JOYSTICK
           Joystick.setButton(button, current[j]);
+#else
+          if (current[j]) {
+            Keyboard.press(KEY_F16 + button);
+          } else {
+            Keyboard.release(KEY_F16 + button);
+          }
+#endif
           lastButtonState[button] = current[j];
         }
         button++;
@@ -124,7 +148,15 @@ void loop() {
 
     if (lastButtonState[button] != current)
     {
+#ifdef EMULATE_JOYSTICK
       Joystick.setButton(button, current);
+#else
+          if (current) {
+            Keyboard.press(KEY_F16 + button);
+          } else {
+            Keyboard.release(KEY_F16 + button);
+          }
+#endif
       lastButtonState[button] = current;
     }
     button++;
