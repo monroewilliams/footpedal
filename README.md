@@ -2,7 +2,7 @@
 
 This is the hardware and case design for a widget I've built to interface generic foot switches (like those used to control guitar effects processors) to USB.
 
-The device reports itself as a USB HID gamepad with a configurable number of buttons. I use the excellent [USB Overdrive](https://www.usboverdrive.com) software to map the buttons to macros and app-specific keybindings. If you're using MacOS I highly recommend it. (I'm not affiliated with the creator of USB Overdrive, I'm just a satisfied customer.)
+The device reports itself as either a USB HID gamepad with a configurable number of buttons, or as a keyboard which reports presses on F16, F17, etc. Switch between these modes by commenting/uncommenting the definition of `EMULATE_JOYSTICK` in footpedal.cpp.
 
 The hardware is currently based around a Sparkfun Pro Micro (since that's what I had lying around):
 
